@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product — Lemonadee</title>
+<meta name="description" content="Lemonadee 3D-printed product.">
+<meta name="theme-color" content="#032425">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="container">
+<a class="logo" href="index.html" aria-label="Lemonadee home"><img src="assets/img/logo.svg" alt="Lemonadee" width="406" height="70"></a>
+<nav id="site-nav" class="nav" aria-label="Main">
+<a href="index.html">Home</a>
+<a href="shop.html" aria-current="page">Shop</a>
+<a href="custom.html">Custom order</a>
+<a href="custom.html#about">About</a>
+</nav>
+<div class="header-actions">
+<a href="#" class="btn cart-btn" aria-label="Cart, 0 items"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg><span>Cart <span data-cart-count>0</span></span></a>
+<button class="btn menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+</div>
+</div>
+</header>
+<main id="main">
+
+<div class="container">
+<p class="crumbs"><a href="shop.html">Shop</a> / <span id="crumb-cat"></span></p>
+<div class="pdp" id="pdp">
+<div class="pdp-media">
+<div class="frame" id="pdp-frame"></div>
+<div class="thumbs" id="pdp-thumbs" role="group" aria-label="Views"></div>
+</div>
+<div class="pdp-info">
+<span class="badge" id="pdp-badge" hidden></span>
+<h1 class="display-l grad-text" id="pdp-title" style="margin-top:14px">Loading…</h1>
+<p class="muted" id="pdp-meta" style="margin:8px 0 0"></p>
+<p class="price" id="pdp-price"></p>
+<p class="desc" id="pdp-desc"></p>
+<fieldset class="opt">
+<legend>Color: <span id="pdp-color-name"></span></legend>
+<div class="swatches" id="pdp-swatches" role="radiogroup" aria-label="Color"></div>
+</fieldset>
+<fieldset class="opt">
+<legend>Quantity</legend>
+<div class="qty">
+<button type="button" id="qty-minus" aria-label="Decrease quantity">−</button>
+<input id="qty" type="number" min="1" max="20" value="1" aria-label="Quantity">
+<button type="button" id="qty-plus" aria-label="Increase quantity">+</button>
+</div>
+</fieldset>
+<div class="pdp-actions">
+<button type="button" class="btn btn-primary" id="add-btn">Add to cart</button>
+<a class="btn" id="custom-btn" href="custom.html">Customize this</a>
+</div>
+<div class="details"><ul id="pdp-details"></ul></div>
+</div>
+</div>
+</div>
+
+<section class="section section-ruled" aria-labelledby="more-title">
+<div class="container">
+<div class="section-head"><h2 id="more-title" class="display-l grad-text">You might also like</h2></div>
+<div class="grid featured" id="more-grid"></div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="container">
+<div>
+<img src="assets/img/logo-reverse.svg" alt="Lemonadee" width="406" height="70">
+<p style="margin:12px 0 0"><small>Printed to order · Ships in [X] days</small></p>
+</div>
+<nav aria-label="Footer">
+<a href="shop.html">Shop</a><a href="custom.html">Custom order</a><a href="custom.html#about">About</a><a href="custom.html#contact">Contact</a>
+</nav>
+<small>© <span data-year>2026</span> Lemonadee</small>
+</div>
+</footer>
+<script src="assets/js/products.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+(function () {
+  const id = new URLSearchParams(location.search).get("id");
+  const p = PRODUCTS.find(x => x.id === id) || PRODUCTS[0];
+  document.title = p.name + " — Lemonadee";
+  const $ = s => document.getElementById(s);
+  $("crumb-cat").innerHTML = `<a href="shop.html?category=${p.category}">${categoryLabel(p.category)}</a> / ${escapeHTML(p.name)}`;
+  $("pdp-title").textContent = p.name;
+  $("pdp-meta").textContent = p.meta;
+  $("pdp-price").textContent = p.price;
+  $("pdp-desc").textContent = p.description;
+  if (p.badge) { const b = $("pdp-badge"); b.textContent = p.badge; b.hidden = false; if (p.badge === "New drop") b.classList.add("badge-new"); }
+  $("pdp-frame").innerHTML = productMedia(p, true);
+
+  const views = [p.art, "stand", "lamp"].filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
+  $("pdp-thumbs").innerHTML = p.image ? "" : views.map((v, i) =>
+    `<button type="button" data-view="${v}" aria-pressed="${i === 0}" aria-label="View ${i + 1}">${pixelSVG(v)}</button>`).join("");
+  $("pdp-thumbs").addEventListener("click", e => {
+    const b = e.target.closest("[data-view]"); if (!b) return;
+    $("pdp-thumbs").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $("pdp-frame").innerHTML = pixelSVG(b.dataset.view, p.name + " illustration");
+  });
+
+  let color = p.colors[0];
+  function renderSwatches() {
+    $("pdp-swatches").innerHTML = p.colors.map((c, i) =>
+      `<button type="button" class="swatch" role="radio" aria-checked="${c === color}" aria-label="${escapeHTML(c.name)}" data-i="${i}" style="background:${c.hex}"></button>`).join("");
+    $("pdp-color-name").textContent = color.name;
+  }
+  $("pdp-swatches").addEventListener("click", e => {
+    const b = e.target.closest("[data-i]"); if (!b) return;
+    color = p.colors[+b.dataset.i]; renderSwatches();
+    $("pdp-swatches").querySelector(`[data-i="${b.dataset.i}"]`).focus();
+  });
+  renderSwatches();
+
+  const qty = $("qty");
+  const clamp = v => Math.max(1, Math.min(20, parseInt(v, 10) || 1));
+  $("qty-minus").onclick = () => (qty.value = clamp(+qty.value - 1));
+  $("qty-plus").onclick = () => (qty.value = clamp(+qty.value + 1));
+  qty.onchange = () => (qty.value = clamp(qty.value));
+  $("add-btn").onclick = () => window.lemonAddToCart(clamp(qty.value));
+  $("custom-btn").href = "custom.html?product=" + encodeURIComponent(p.id);
+
+  $("pdp-details").innerHTML = p.details.map(d => `<li>${escapeHTML(d)}</li>`).join("");
+  $("more-grid").innerHTML = PRODUCTS.filter(x => x.id !== p.id).slice(0, 4).map(productCard).join("");
+})();
+</script>
+</body>
+</html>
