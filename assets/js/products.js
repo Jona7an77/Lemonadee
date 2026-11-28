@@ -4,6 +4,11 @@
    - art: which pixel illustration to show until you add real photos
      (stand, cat, hero, name, lamp, map). To use a photo instead, set
      image: "assets/img/your-photo.jpg".
+   - featured: true puts the product in the home-page hero carousel and
+     the "Featured drops" grid.
+   - tagline: short headline shown on its carousel slide.
+   - cutout: optional transparent PNG (background removed) for the
+     carousel, e.g. "assets/img/map-stand-cutout.png". Falls back to image.
    - category: must match one of CATEGORIES below. */
 
 const CATEGORIES = [
@@ -16,6 +21,7 @@ const CATEGORIES = [
 const PRODUCTS = [
   {
     id: "fantasy-map-stand",
+    tagline: "Legendary map",
     name: "Fantasy Map Controller Stand",
     category: "stands",
     meta: "Fits Switch 1 & 2 Pro",
@@ -34,6 +40,7 @@ const PRODUCTS = [
   },
   {
     id: "8-bit-cat-lamp",
+    tagline: "Glow up",
     name: "8-Bit Cat Desk Lamp",
     category: "lamps",
     meta: "Multicolor print · USB powered",
@@ -51,6 +58,7 @@ const PRODUCTS = [
   },
   {
     id: "pixel-hero-base",
+    tagline: "Level up",
     name: "Pixel Hero Display Base",
     category: "display",
     meta: "For figures up to 6 in",
@@ -67,6 +75,7 @@ const PRODUCTS = [
   },
   {
     id: "custom-name-stand",
+    tagline: "Make it yours",
     name: "Custom Name Controller Stand",
     category: "custom",
     meta: "Your name or gamertag",
@@ -199,6 +208,29 @@ function pixelSVG(key, label) {
 function productMedia(p, labelled) {
   if (p.image) return `<img src="${p.image}" alt="${labelled ? p.name : ""}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`;
   return pixelSVG(p.art, labelled ? p.name + " illustration" : "");
+}
+
+function slideMedia(p) {
+  const src = p.cutout || p.image;
+  if (src) return `<img src="${src}" alt="${escapeHTML(p.name)}"${p.cutout ? ' class="is-cutout"' : ""}>`;
+  return pixelSVG(p.art, p.name + " illustration");
+}
+
+function heroSlide(p, i, total) {
+  return `
+  <li class="hc-slide" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${total}">
+    <a class="hc-card" href="product.html?id=${encodeURIComponent(p.id)}">
+      <p class="hc-tagline">${escapeHTML(p.tagline || p.name)}</p>
+      <div class="hc-stage">
+        <span class="hc-plate" aria-hidden="true"></span>
+        <span class="hc-pix hc-pix-a" aria-hidden="true"></span>
+        <span class="hc-pix hc-pix-b" aria-hidden="true"></span>
+        <span class="hc-pix hc-pix-c" aria-hidden="true"></span>
+        <div class="hc-media">${slideMedia(p)}</div>
+      </div>
+      <p class="hc-name"><span>${escapeHTML(p.name)}</span><span class="hc-go" aria-hidden="true">→</span></p>
+    </a>
+  </li>`;
 }
 
 function categoryLabel(id) {
